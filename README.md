@@ -3,7 +3,7 @@
 ## Install
 
 ```
-pip install torret_parser
+pip install torrent_parser
 ```
 
 ## Usage:
