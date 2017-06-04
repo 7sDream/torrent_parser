@@ -7,9 +7,9 @@ A .torrent file parser for both Python 2 and 3
 Usage:
 
     data = parse_torrent_file(filename)
-    
+
     # or
-    
+
     with open(filename, 'rb') as f: # the binary mode 'b' is necessary
         data = TorrentFileParser(f).parse()
 """
@@ -62,7 +62,7 @@ class TorrentFileParser(object):
 
     def __init__(self, fp, use_ordered_dict=False, encoding='utf-8'):
         """
-        :param fp: a **binary** file-like object to parse, 
+        :param fp: a **binary** file-like object to parse,
           which means need 'b' mode when use built-in open function
         :param encoding: file content encoding, default utf-8
         :param use_ordered_dict: Use collections.OrderedDict as dict container
@@ -206,7 +206,7 @@ class TorrentFileParser(object):
 def parse_torrent_file(filename, use_ordered_dict=False):
     """
     Shortcut function for parse torrent object use TorrentFileParser
-    
+
     :param string filename: torrent filename
     :param bool use_ordered_dict: see :any:`TorrentFileParser.__init__`
     :rtype: dict if ``use_ordered_dict`` is false,
@@ -229,6 +229,8 @@ def __main():
     parser.add_argument('--ascii', '-a', action='store_true', default=False,
                         help='ensure output json use ascii char, '
                              'escape other char use \\u')
+    parser.add_argument('--coding', '-c', default='utf-8',
+                        help='string encoding, default utf-8')
     parser.add_argument('--version', '-v', action='store_true', default=False,
                         help='print version and exit')
     args = parser.parse_args()
@@ -249,7 +251,7 @@ def __main():
         exit(1)
 
     # noinspection PyUnboundLocalVariable
-    data = TorrentFileParser(target_file, not args.dict).parse()
+    data = TorrentFileParser(target_file, not args.dict, args.coding).parse()
 
     data = json.dumps(
         data, ensure_ascii=args.ascii,
