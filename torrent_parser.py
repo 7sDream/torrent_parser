@@ -126,7 +126,11 @@ class TorrentFileParser(object):
             except InvalidTorrentFileException:
                 return
             if k == 'pieces':
-                v = self._pieces()
+                v = self._next_hash()
+            elif k == 'ed2k':
+                v = self._next_hash(16, False)
+            elif k == 'filehash':
+                v = self._next_hash(20, False)
             else:
                 v = self._next_element()
             if k == 'encoding':
@@ -173,14 +177,19 @@ class TorrentFileParser(object):
     def __to_hex(v):
         return hex(ord(v) if isinstance(v, str) else v)[2:].rjust(2, str(0))
 
-    def _pieces(self):
+    def _next_hash(self, p_len=20, need_list=True):
         raw = self._next_string(decode=False)
-        if len(raw) % 20 != 0:
+        if len(raw) % p_len != 0:
             raise InvalidTorrentFileException(self._pos)
-        return [
+        res = [
             ''.join([self.__to_hex(c) for c in h])
-            for h in (raw[x:x+20] for x in range(0, len(raw), 20))
+            for h in (raw[x:x+p_len] for x in range(0, len(raw), p_len))
         ]
+        if len(res) == 0 and not need_list:
+            return ''
+        if len(res) == 1 and not need_list:
+            return res[0]
+        return res
 
     def _next_end(self):
         raise InvalidTorrentFileException(self._pos)
