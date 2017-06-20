@@ -35,7 +35,7 @@ __all__ = [
     'TorrentFileParser',
 ]
 
-__version__ = '0.1.1'
+__version__ = '0.1.3'
 
 
 class InvalidTorrentDataException(Exception):
