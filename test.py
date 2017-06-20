@@ -26,24 +26,18 @@ class Test(unittest.TestCase):
 
     def test_parse_correctness(self):
         data = parse_torrent_file(self.TEST_FILENAME)
-        self.assertIn(['udp://p4p.arenabg.ch:1337/announce'],
+        self.assertIn(['udp://tracker.publicbt.com:80/announce'],
                       data['announce-list'])
-        self.assertEqual(data['comment'],
-                         'Torrent downloaded from https://rarbg.to')
-        self.assertEqual(data['creation date'], 1472762993)
+        self.assertEqual(data['creation date'], 1409254242)
 
     def test_parse_two_times(self):
         with open(self.TEST_FILENAME, 'rb') as fp:
             parser = TorrentFileParser(fp)
             data = parser.parse()
-            self.assertIn(['udp://p4p.arenabg.ch:1337/announce'],
+            self.assertIn(['udp://tracker.publicbt.com:80/announce'],
                           data['announce-list'])
-            self.assertEqual(data['comment'],
-                             'Torrent downloaded from https://rarbg.to')
-            self.assertEqual(data['creation date'], 1472762993)
+            self.assertEqual(data['creation date'], 1409254242)
             data = parser.parse()
-            self.assertIn(['udp://p4p.arenabg.ch:1337/announce'],
+            self.assertIn(['udp://tracker.publicbt.com:80/announce'],
                           data['announce-list'])
-            self.assertEqual(data['comment'],
-                             'Torrent downloaded from https://rarbg.to')
-            self.assertEqual(data['creation date'], 1472762993)
+            self.assertEqual(data['creation date'], 1409254242)
