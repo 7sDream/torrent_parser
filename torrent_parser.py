@@ -22,9 +22,15 @@ import io
 import json
 import sys
 
+try:
+    FileNotFoundError
+except NameError:
+    # Python 2 do not have FileNotFoundError, use IOError instead
+    # noinspection PyShadowingBuiltins
+    FileNotFoundError = IOError
 
 __all__ = [
-    'InvalidTorrentFileException',
+    'InvalidTorrentDataException',
     'parse_torrent_file',
     'TorrentFileParser',
 ]
@@ -32,10 +38,17 @@ __all__ = [
 __version__ = '0.1.1'
 
 
-class InvalidTorrentFileException(Exception):
+class InvalidTorrentDataException(Exception):
     def __init__(self, pos, msg=None):
-        msg = msg or "Invalid torrent format when reading at pos " + str(pos)
-        super(InvalidTorrentFileException, self).__init__(msg)
+        msg = msg or "Invalid torrent format when read at pos {pos}"
+        msg = msg.format(pos=pos)
+        super(InvalidTorrentDataException, self).__init__(msg)
+
+
+class __EndCls(object):
+    pass
+
+_END = __EndCls()
 
 
 class TorrentFileParser(object):
@@ -88,7 +101,7 @@ class TorrentFileParser(object):
 
         try:
             c = self._read_byte(1, True)
-            raise InvalidTorrentFileException(
+            raise InvalidTorrentDataException(
                 0, 'Expect EOF, but get [{}] at pos {}'.format(c, self._pos)
             )
         except EOFError:  # expect EOF
@@ -97,7 +110,7 @@ class TorrentFileParser(object):
         if isinstance(data, dict):
             return data
 
-        raise InvalidTorrentFileException('Outermost element is not a dict')
+        raise InvalidTorrentDataException('Outermost element is not a dict')
 
     def _read_byte(self, count=1, raise_eof=False):
         assert count >= 0
@@ -105,7 +118,7 @@ class TorrentFileParser(object):
         if count != 0 and len(gotten) == 0:
             if raise_eof:
                 raise EOFError()
-            raise InvalidTorrentFileException(
+            raise InvalidTorrentDataException(
                 self._pos,
                 'Unexpected EOF when reading torrent file'
             )
@@ -121,9 +134,8 @@ class TorrentFileParser(object):
 
     def _dict_items_generator(self):
         while True:
-            try:
-                k = self._next_element()
-            except InvalidTorrentFileException:
+            k = self._next_element()
+            if k is _END:
                 return
             if k == 'pieces':
                 v = self._next_hash()
@@ -145,9 +157,8 @@ class TorrentFileParser(object):
 
     def _list_items_generator(self):
         while True:
-            try:
-                element = self._next_element()
-            except InvalidTorrentFileException:
+            element = self._next_element()
+            if element is _END:
                 return
             yield element
 
@@ -160,7 +171,7 @@ class TorrentFileParser(object):
         while char != end:
             # noinspection PyTypeChecker
             if not b'0' <= char <= b'9':
-                raise InvalidTorrentFileException(self._pos)
+                raise InvalidTorrentDataException(self._pos - 1)
             value = value * 10 + int(char) - int(b'0')
             char = self._read_byte(1)
         return value
@@ -169,7 +180,13 @@ class TorrentFileParser(object):
         length = self._next_int(b':')
         raw = self._read_byte(length)
         if decode:
-            string = raw.decode(self._encoding)
+            try:
+                string = raw.decode(self._encoding)
+            except UnicodeDecodeError as e:
+                raise InvalidTorrentDataException(
+                    self._pos - length + e.start,
+                    "Fail to decode string at pos {pos} using " + e.encoding
+                )
             return string
         return raw
 
@@ -180,7 +197,9 @@ class TorrentFileParser(object):
     def _next_hash(self, p_len=20, need_list=True):
         raw = self._next_string(decode=False)
         if len(raw) % p_len != 0:
-            raise InvalidTorrentFileException(self._pos)
+            raise InvalidTorrentDataException(
+                self._pos - len(raw), "Hash bit length not match at pos {pos}"
+            )
         res = [
             ''.join([self.__to_hex(c) for c in h])
             for h in (raw[x:x+p_len] for x in range(0, len(raw), p_len))
@@ -191,8 +210,9 @@ class TorrentFileParser(object):
             return res[0]
         return res
 
-    def _next_end(self):
-        raise InvalidTorrentFileException(self._pos)
+    @staticmethod
+    def _next_end():
+        return _END
 
     def _next_type(self):
         for (element_type, indicator) in self.TYPES:
@@ -201,7 +221,7 @@ class TorrentFileParser(object):
             if indicator == char:
                 return element_type
             self._seek_back(indicator_length)
-        raise InvalidTorrentFileException(self._pos)
+        raise InvalidTorrentDataException(self._pos)
 
     def _type_to_func(self, t):
         return getattr(self, '_next_' + t)
@@ -256,7 +276,7 @@ def __main():
         else:
             target_file = open(args.file, 'rb')
     except FileNotFoundError:
-        sys.stderr.write('Unable to find file {}\n'.format(args.file))
+        sys.stderr.write('File "{}" not exist\n'.format(args.file))
         exit(1)
 
     # noinspection PyUnboundLocalVariable
