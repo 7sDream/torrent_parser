@@ -21,6 +21,7 @@ import collections
 import io
 import json
 import sys
+import warnings
 
 try:
     FileNotFoundError
@@ -29,6 +30,14 @@ except NameError:
     # noinspection PyShadowingBuiltins
     FileNotFoundError = IOError
 
+try:
+    # noinspection PyPackageRequirements
+    from chardet import detect as _detect
+except ImportError:
+    def _detect(_):
+        warnings.warn("No chardet module installed, encoding will be utf-8")
+        return {'encoding': 'utf-8', 'confidence': 1}
+
 __all__ = [
     'InvalidTorrentDataException',
     'parse_torrent_file',
@@ -36,6 +45,10 @@ __all__ = [
 ]
 
 __version__ = '0.1.3'
+
+
+def detect(content):
+    return _detect(content)['encoding']
 
 
 class InvalidTorrentDataException(Exception):
@@ -47,6 +60,7 @@ class InvalidTorrentDataException(Exception):
 
 class __EndCls(object):
     pass
+
 
 _END = __EndCls()
 
@@ -77,7 +91,8 @@ class TorrentFileParser(object):
         """
         :param fp: a **binary** file-like object to parse,
           which means need 'b' mode when use built-in open function
-        :param encoding: file content encoding, default utf-8
+        :param encoding: file content encoding, default utf-8, use 'auto' to
+          enable charset auto detection ('chardet' package should be installed)
         :param use_ordered_dict: Use collections.OrderedDict as dict container
           default False, which mean use built-in dict
         """
@@ -127,6 +142,7 @@ class TorrentFileParser(object):
 
     def _seek_back(self, count):
         self._content.seek(-count, 1)
+        self._pos = self._pos - count
 
     def _restart(self):
         self._content.seek(0, 0)
@@ -168,20 +184,26 @@ class TorrentFileParser(object):
     def _next_int(self, end=END_INDICATOR):
         value = 0
         char = self._read_byte(1)
+        neg = False
         while char != end:
-            # noinspection PyTypeChecker
-            if not b'0' <= char <= b'9':
+            if not neg and char == b'-':
+                neg = True
+            elif not b'0' <= char <= b'9':
                 raise InvalidTorrentDataException(self._pos - 1)
-            value = value * 10 + int(char) - int(b'0')
+            else:
+                value = value * 10 + int(char) - int(b'0')
             char = self._read_byte(1)
-        return value
+        return -value if neg else value
 
     def _next_string(self, decode=True):
         length = self._next_int(b':')
         raw = self._read_byte(length)
         if decode:
+            encoding = self._encoding
+            if encoding == 'auto':
+                encoding = detect(raw)
             try:
-                string = raw.decode(self._encoding)
+                string = raw.decode(encoding)
             except UnicodeDecodeError as e:
                 raise InvalidTorrentDataException(
                     self._pos - length + e.start,
@@ -288,6 +310,7 @@ def __main():
     )
 
     print(data)
+
 
 if __name__ == '__main__':
     __main()

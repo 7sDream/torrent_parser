@@ -37,8 +37,12 @@ http://tracker.trackerfix.com:80/announce
 ## Test
 
 ```bash
-python -m unittest test
+python -m unittest tests
 ```
+
+## Changelog
+
+See [Changelog][CHANGELOG].
 
 ## LICENSE
 
@@ -48,3 +52,4 @@ See [License][LICENSE].
 [screenshots-normal]: http://rikka-10066868.image.myqcloud.com/1492616d-9f14-4fe2-9146-9a3ac06c6868.png
 [screenshots-indent]: http://rikka-10066868.image.myqcloud.com/eadc4184-6deb-42eb-bfd4-239da8f50c08.png
 [LICENSE]: https://github.com/7sDream/torrent_parser/blob/master/LICENSE
+[CHANGELOG]: https://github.com/7sDream/torrent_parser/blob/master/CHANGELOG.md
