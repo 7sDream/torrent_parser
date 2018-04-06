@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.1.4] - 2018-04-06
+
 ### Added
 
 - `encoding` option can be `auto`, which will use `chardet` package to decide which encoding to use. If `chardet` is noe installed, will raise a warning and fallback to 'utf-8'. (Thanks to [@ltfychrise])
@@ -62,6 +64,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 [@ltfychrise]: https://github.com/ltfychrise
 [Unreleased]: https://github.com/7sDream/torrent_parser/compare/v0.1.3...HEAD
+[0.1.4]: https://github.com/7sDream/torrent_parser/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/7sDream/torrent_parser/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/7sDream/torrent_parser/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/7sDream/torrent_parser/compare/v0.1.0...v0.1.1
