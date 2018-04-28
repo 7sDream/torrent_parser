@@ -17,7 +17,7 @@ setup(
     license='MIT',
     author='7sDream',
     author_email='7seconddream@gmail.com',
-    description='A .torrent file parser for both Python 2 and 3',
+    description='A .torrent file parser and creator for both Python 2 and 3',
     install_requires=[],
     entry_points={
         'console_scripts': ['pytp=torrent_parser:__main']

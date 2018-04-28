@@ -69,7 +69,7 @@ __all__ = [
     'TorrentFileParser',
 ]
 
-__version__ = '0.1.4'
+__version__ = '0.1.5rc1'
 
 
 def detect(content):

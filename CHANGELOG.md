@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.1.5rc1] - 2018.4.28
+
 ### Added
 
 - `TorrentFileCreator` class and `create_torrent_file` shortcut function for write back data to a torrent file
@@ -67,7 +69,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Available on pip.
 
 [@ltfychrise]: https://github.com/ltfychrise
-[Unreleased]: https://github.com/7sDream/torrent_parser/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/7sDream/torrent_parser/compare/v0.1.5rc1...HEAD
+[0.1.5rc1]: https://github.com/7sDream/torrent_parser/compare/v0.1.4...v0.1.5rc1
 [0.1.4]: https://github.com/7sDream/torrent_parser/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/7sDream/torrent_parser/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/7sDream/torrent_parser/compare/v0.1.1...v0.1.2

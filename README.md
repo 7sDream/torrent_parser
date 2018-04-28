@@ -1,4 +1,4 @@
-# Torrent file parser for Python
+# Torrent file parser and creator for Python
 
 A simple parser for `.torrent` file.
 
