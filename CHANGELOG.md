@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- `TorrentFileCreator` class and `create_torrent_file` shortcut function for write back data to a torrent file
+
 ## [0.1.4] - 2018-04-06
 
 ### Added

@@ -1,14 +1,16 @@
 from __future__ import unicode_literals
 
-import unittest
 import collections
+import os.path
+import unittest
 
 from torrent_parser import TorrentFileParser, parse_torrent_file
 
 
-class Test(unittest.TestCase):
-    REAL_FILE = 'tests/testfiles/real.torrent'
-    NEG_FILE = 'tests/testfiles/neg.torrent'
+class TestParse(unittest.TestCase):
+    TEST_FILES_DIR = os.path.join(os.path.dirname(__file__), 'test_files')
+    REAL_FILE = os.path.join(TEST_FILES_DIR, 'real.torrent')
+    NEG_FILE = os.path.join(TEST_FILES_DIR, 'neg.torrent')
 
     def test_parse_torrent_file_use_shortcut(self):
         parse_torrent_file(self.REAL_FILE)
