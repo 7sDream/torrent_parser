@@ -1,5 +1,9 @@
 # Torrent file parser for Python
 
+A simple parser for `.torrent` file.
+
+Can also edit and write back to torrent format after version 0.1.5.
+
 ## Install
 
 ```
@@ -32,6 +36,8 @@ $ cat test.torrent | pytp
 >>> data = tp.parse_torrent_file('test.torrent')
 >>> print(data['announce'])
 http://tracker.trackerfix.com:80/announce
+>>> data['announce'] = 'http://127.0.0.1:12345'
+>>> tp.create_torrent_file('new.torrent', data)
 ```
 
 ## Test
