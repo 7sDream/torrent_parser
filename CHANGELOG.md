@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.2.0] - 2018.5.25
+
+### Change
+
+- Just bump version to 0.2.0 to follow semver.
+
 ## [0.1.5rc1] - 2018.4.28
 
 ### Added
@@ -69,7 +75,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Available on pip.
 
 [@ltfychrise]: https://github.com/ltfychrise
-[Unreleased]: https://github.com/7sDream/torrent_parser/compare/v0.1.5rc1...HEAD
+[Unreleased]: https://github.com/7sDream/torrent_parser/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/7sDream/torrent_parser/compare/v0.1.5rc1...v0.2.0
 [0.1.5rc1]: https://github.com/7sDream/torrent_parser/compare/v0.1.4...v0.1.5rc1
 [0.1.4]: https://github.com/7sDream/torrent_parser/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/7sDream/torrent_parser/compare/v0.1.2...v0.1.3

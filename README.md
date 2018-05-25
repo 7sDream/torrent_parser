@@ -2,7 +2,7 @@
 
 A simple parser for `.torrent` file.
 
-Can also edit and write back to torrent format after version 0.1.5.
+Can also edit and write back to torrent format after version 0.2.0.
 
 ## Install
 
