@@ -233,7 +233,7 @@ class TorrentFileParser(object):
             if encoding == 'auto':
                 encoding = detect(raw)
             try:
-                string = raw.decode(encoding)
+                string = raw.decode(encoding, "ignore")
             except UnicodeDecodeError as e:
                 raise InvalidTorrentDataException(
                     self._pos - length + e.start,
