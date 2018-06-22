@@ -62,11 +62,14 @@ except NameError:
     str_type = str
 
 __all__ = [
+    'InvalidTorrentDataException',
+    'BEncoder',
+    'BDecoder',
+    'encode',
+    'decode',
+    'TorrentFileParser',
     'create_torrent_file',
     'parse_torrent_file',
-    'InvalidTorrentDataException',
-    'TorrentFileCreator',
-    'TorrentFileParser',
 ]
 
 __version__ = '0.2.0'
@@ -105,7 +108,7 @@ class TorrentFileParser(object):
     STRING_INDICATOR = b''
     STRING_DELIMITER = b':'
 
-    RAW_FIELD_PARAMS = {
+    HASH_FIELD_PARAMS = {
         # field length need_list
         'pieces': (20, True),
         'ed2k': (16, False),
@@ -120,14 +123,18 @@ class TorrentFileParser(object):
         (TYPE_STRING, STRING_INDICATOR),
     ]
 
-    def __init__(self, fp, use_ordered_dict=False, encoding='utf-8'):
+    def __init__(
+            self, fp, use_ordered_dict=False, encoding='utf-8', errors='strict'
+    ):
         """
         :param fp: a **binary** file-like object to parse,
           which means need 'b' mode when use built-in open function
-        :param encoding: file content encoding, default utf-8, use 'auto' to
-          enable charset auto detection ('chardet' package should be installed)
-        :param use_ordered_dict: Use collections.OrderedDict as dict container
-          default False, which mean use built-in dict
+        :param bool use_ordered_dict: Use collections.OrderedDict as dict
+          container default False, which mean use built-in dict
+        :param string encoding: file content encoding, default utf-8, use 'auto'
+          to enable charset auto detection (need 'chardet' package installed)
+        :param string errors: how to deal with encoding error when try to parse
+          string from content with ``encoding``
         """
         if getattr(fp, 'read', ) is None \
                 or getattr(fp, 'seek') is None:
@@ -137,12 +144,14 @@ class TorrentFileParser(object):
         self._encoding = encoding
         self._content = fp
         self._use_ordered_dict = use_ordered_dict
+        self._error_handler = errors
 
     def parse(self):
         """
         :return: the parse result
-        :type: depends on ``use_ordered_dict`` option when init the parser
-          see :any:`TorrentFileParser.__init__`
+        :rtype: dict|list|int|string
+        :raise: :any:`InvalidTorrentDataException` when parse failed or error
+          happened when decode string using specified encoding
         """
         self._restart()
         data = self._next_element()
@@ -155,10 +164,7 @@ class TorrentFileParser(object):
         except EOFError:  # expect EOF
             pass
 
-        if isinstance(data, dict):
-            return data
-
-        raise InvalidTorrentDataException('Outermost element is not a dict')
+        return data
 
     def _read_byte(self, count=1, raise_eof=False):
         assert count >= 0
@@ -186,9 +192,8 @@ class TorrentFileParser(object):
             k = self._next_element()
             if k is _END:
                 return
-            if k in self.RAW_FIELD_PARAMS:
-                length, need_list = self.RAW_FIELD_PARAMS[k]
-                v = self._next_hash(length, need_list)
+            if k in self.HASH_FIELD_PARAMS:
+                v = self._next_hash(*self.HASH_FIELD_PARAMS[k])
             else:
                 v = self._next_element()
             if k == 'encoding':
@@ -225,25 +230,26 @@ class TorrentFileParser(object):
             char = self._read_byte(1)
         return -value if neg else value
 
-    def _next_string(self, decode=True):
+    def _next_string(self, need_decode=True):
         length = self._next_int(self.STRING_DELIMITER)
         raw = self._read_byte(length)
-        if decode:
+        if need_decode:
             encoding = self._encoding
             if encoding == 'auto':
-                encoding = detect(raw)
+                self.encoding = encoding = detect(raw)
             try:
-                string = raw.decode(encoding, "ignore")
+                string = raw.decode(encoding, self._error_handler)
             except UnicodeDecodeError as e:
                 raise InvalidTorrentDataException(
                     self._pos - length + e.start,
-                    "Fail to decode string at pos {pos} using " + e.encoding
+                    "Fail to decode string at pos {pos} using encoding " +
+                    e.encoding
                 )
             return string
         return raw
 
     def _next_hash(self, p_len, need_list):
-        raw = self._next_string(decode=False)
+        raw = self._next_string(need_decode=False)
         if len(raw) % p_len != 0:
             raise InvalidTorrentDataException(
                 self._pos - len(raw), "Hash bit length not match at pos {pos}"
@@ -280,7 +286,7 @@ class TorrentFileParser(object):
         return element
 
 
-class TorrentFileCreator(object):
+class BEncoder(object):
 
     TYPES = {
         (dict,): TorrentFileParser.TYPE_DICT,
@@ -291,27 +297,25 @@ class TorrentFileCreator(object):
 
     def __init__(self, data, encoding='utf-8'):
         """
-        :param data: torrent data, must be a dict or OrderedDict
-        :param encoding: string field output encoding
+        :param dict|list|int|string data: data will be encoded
+        :param string encoding: string field output encoding
         """
-        if not isinstance(data, dict):
-            raise InvalidTorrentDataException(
-                None,
-                "Top level structure should be a dict"
-            )
         self._data = data
         self._encoding = encoding
 
     def encode(self):
         """
-        Encode data to bytes that conform to torrent file format
+        Encode to bytes
+
+        :rtype: bytes
         """
         return b''.join(self._output_element(self._data))
 
-    def encode_to_readable(self):
+    def encode_to_filelike(self):
         """
-        Encode data to a file-like(BytesIO) object which contains the result of
-        `TorrentFileCreator.encode()`
+        Encode to a file-like(BytesIO) object
+
+        :rtype: BytesIO
         """
         return io.BytesIO(self.encode())
 
@@ -364,7 +368,7 @@ class TorrentFileCreator(object):
                 )
             for x in self._output_element(k):
                 yield x
-            if k in TorrentFileParser.RAW_FIELD_PARAMS:
+            if k in TorrentFileParser.HASH_FIELD_PARAMS:
                 for x in self._output_decode_hash(v):
                     yield x
             else:
@@ -393,29 +397,79 @@ class TorrentFileCreator(object):
         )
 
 
-def parse_torrent_file(filename, use_ordered_dict=False):
+class BDecoder(object):
+    def __init__(
+        self, data, use_ordered_dict=False, encoding='utf-8', errors='strict'
+    ):
+        """
+        :param bytes data: raw data to be decoded
+        :param bool use_ordered_dict: see :any:`TorrentFileParser.__init__`
+        :param string encoding: see :any:`TorrentFileParser.__init__`
+        :param string errors: see :any:`TorrentFileParser.__init__`
+        """
+        self._data = bytes(data)
+        self._use_ordered_dict = use_ordered_dict
+        self._encoding = encoding
+        self._errors = errors
+
+    def decode(self):
+        return TorrentFileParser(
+            io.BytesIO(self._data), self._use_ordered_dict, self._encoding,
+            self._errors,
+        ).parse()
+
+
+def encode(data, encoding='utf-8'):
+    """
+    Shortcut function for encode python object to torrent file format(bencode)
+
+    :param dict|list|int|string data: data to be encoded
+    :param string encoding: see :any:`TorrentFileParser.__init__`
+    :rtype: bytes
+    """
+    return BEncoder(data, encoding).encode()
+
+
+def decode(data, use_ordered_dict=False, encoding='utf-8', errors='strict'):
+    """
+    Shortcut function for decode bytes as torrent file format(bencode) to python
+    object
+
+    :param bytes data: raw data to be decoded
+    :param bool use_ordered_dict: see :any:`TorrentFileParser.__init__`
+    :param string encoding: see :any:`TorrentFileParser.__init__`
+    :param string errors: see :any:`TorrentFileParser.__init__`
+    :rtype: dict|list|int|string
+    """
+    return BDecoder(data, use_ordered_dict, encoding, errors).decode()
+
+
+def parse_torrent_file(
+        filename, use_ordered_dict=False, encoding='utf-8', errors='strict',
+):
     """
     Shortcut function for parse torrent object using TorrentFileParser
 
     :param string filename: torrent filename
     :param bool use_ordered_dict: see :any:`TorrentFileParser.__init__`
-    :rtype: dict if ``use_ordered_dict`` is false,
-      collections.OrderedDict otherwise
+    :param string encoding: see :any:`TorrentFileParser.__init__`
+    :param string errors: see :any:`TorrentFileParser.__init__`
+    :rtype: dict|list|int|string
     """
     with open(filename, 'rb') as f:
-        return TorrentFileParser(f, use_ordered_dict).parse()
+        return TorrentFileParser(f, use_ordered_dict, encoding, errors).parse()
 
 
 def create_torrent_file(filename, data, encoding='utf-8'):
     """
     Shortcut function for create a torrent file using TorrentFileCreator
 
-    :param filename: output torrent filename
-    :param data: torrent data, must be a dict or OrderedDict
-    :param encoding: string field output encoding
+    :param string filename: output torrent filename
+    :param dict|list|int|string data: torrent data
+    :param string encoding: string field output encoding
     """
     with open(filename, 'wb') as f:
-        f.write(TorrentFileCreator(data, encoding).encode())
+        f.write(BEncoder(data, encoding).encode())
 
 
 def __main():
@@ -432,7 +486,10 @@ def __main():
                         help='ensure output json use ascii char, '
                              'escape other char use \\u')
     parser.add_argument('--coding', '-c', default='utf-8',
-                        help='string encoding, default utf-8')
+                        help='string encoding, default "utf-8"')
+    parser.add_argument('--errors', '-e', default='strict',
+                        help='decoding error handler, default "strict", you can'
+                             ' use "ignore" or "replace" to avoid exception')
     parser.add_argument('--version', '-v', action='store_true', default=False,
                         help='print version and exit')
     args = parser.parse_args()
@@ -453,7 +510,9 @@ def __main():
         exit(1)
 
     # noinspection PyUnboundLocalVariable
-    data = TorrentFileParser(target_file, not args.dict, args.coding).parse()
+    data = TorrentFileParser(
+        target_file, not args.dict, args.coding, args.errors
+    ).parse()
 
     data = json.dumps(
         data, ensure_ascii=args.ascii,
