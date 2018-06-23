@@ -11,6 +11,7 @@ class TestParse(unittest.TestCase):
     TEST_FILES_DIR = os.path.join(os.path.dirname(__file__), 'test_files')
     REAL_FILE = os.path.join(TEST_FILES_DIR, 'real.torrent')
     NEG_FILE = os.path.join(TEST_FILES_DIR, 'neg.torrent')
+    STRING_FILE = os.path.join(TEST_FILES_DIR, 'outmost.string.torrent')
 
     def test_parse_torrent_file_use_shortcut(self):
         parse_torrent_file(self.REAL_FILE)
@@ -52,6 +53,10 @@ class TestParse(unittest.TestCase):
     def test_int_is_negative(self):
         data = parse_torrent_file(self.NEG_FILE)
         self.assertEqual(data['neg'], -1)
+
+    def test_dont_need_dict_outmost(self):
+        data = parse_torrent_file(self.STRING_FILE)
+        self.assertEqual(data, 'announce')
 
 
 if __name__ == '__main__':

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Add `errors` option in `TorrentFileParser` and `parse_torrent_file` to let user set the encoding error handler. (Thanks [@yasuotakei](https://github.com/yasuotakei))
+- Add `-e`/`--error` to CLI option to set the `errors` option of `parse_torrent_file`.
+- `BDecoder` class and `decode` shortcut function to directly decode bytes.
+- `decode` shortcut function to directly encode data to bytes.
+- Added `hash_fields` parameter and method to customize hash field list.
+- Added `hash_raw` parameter to let all hash field be parsed as raw bytes.
+
+### Changed
+
+- **BreakChange** `TorrentFileCreator` rename to `BEncoder` as the origin name don't describe its function.
+- `TorrentFileParser` don't need the outmost level of parsed data to be a `dict` now.
+- `BEncoder` don't need the outmost level of encoded data to be a `dict` now.
+- `BEncoder` now support encode raw bytes.
+
 ## [0.2.0] - 2018.5.25
 
 ### Change
@@ -17,7 +33,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- `TorrentFileCreator` class and `create_torrent_file` shortcut function for write back data to a torrent file
+- `TorrentFileCreator` class and `create_torrent_file` shortcut function for write back data to a torrent file.
 
 ## [0.1.4] - 2018-04-06
 

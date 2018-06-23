@@ -4,6 +4,14 @@ A simple parser for `.torrent` file.
 
 Can also edit and write back to torrent format after version 0.2.0.
 
+## Features
+
+- Decoder and encoder for torrent files
+- Auto decode bytes field to string with used specified encoding and error handler
+- Auto detect encoding when use `auto` as encoding(need `chardet` installed)
+- Auto decode hash value filed to hash blocks, also customizable
+- CLI provided, with JSON output
+
 ## Install
 
 ```
@@ -34,10 +42,21 @@ $ cat test.torrent | pytp
 ```pycon
 >>> import torrent_parser as tp
 >>> data = tp.parse_torrent_file('test.torrent')
->>> print(data['announce'])
+>>> data['announce']
 http://tracker.trackerfix.com:80/announce
 >>> data['announce'] = 'http://127.0.0.1:12345'
 >>> tp.create_torrent_file('new.torrent', data)
+```
+
+or you don't operate with file, just raw bytes:
+
+```pycon
+>>> import torrent_parser as tp
+>>> data = tp.decode(b'd3:negi-1ee')
+>>> data['neg']
+-1
+>>> tp.encode(data)
+b'd3:negi-1ee'
 ```
 
 ## Test
