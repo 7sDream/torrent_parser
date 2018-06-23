@@ -373,7 +373,7 @@ class BEncoder(object):
         if hash_fields is not None:
             self._hash_fields.extend(str_type(hash_fields))
 
-    def hash_fields(self, name):
+    def hash_field(self, name):
         """
         see :any:`TorrentFileParser.hash_field`
 
