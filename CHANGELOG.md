@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] - 2018.06.23
 
 ### Added
 
-- Add `errors` option in `TorrentFileParser` and `parse_torrent_file` to let user set the encoding error handler. (Thanks [@yasuotakei](https://github.com/yasuotakei))
+- Add `errors` option in `TorrentFileParser` and `parse_torrent_file` to let user set the encoding error handler. (Thanks [@yasuotakei])
 - Add `-e`/`--error` to CLI option to set the `errors` option of `parse_torrent_file`.
 - `BDecoder` class and `decode` shortcut function to directly decode bytes.
 - `decode` shortcut function to directly encode data to bytes.
@@ -91,7 +91,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Available on pip.
 
 [@ltfychrise]: https://github.com/ltfychrise
-[Unreleased]: https://github.com/7sDream/torrent_parser/compare/v0.2.0...HEAD
+[@yasuotakei]: https://github.com/yasuotakei
+[Unreleased]: https://github.com/7sDream/torrent_parser/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/7sDream/torrent_parser/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/7sDream/torrent_parser/compare/v0.1.5rc1...v0.2.0
 [0.1.5rc1]: https://github.com/7sDream/torrent_parser/compare/v0.1.4...v0.1.5rc1
 [0.1.4]: https://github.com/7sDream/torrent_parser/compare/v0.1.3...v0.1.4
