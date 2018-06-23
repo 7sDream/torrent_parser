@@ -9,8 +9,7 @@ Can also edit and write back to torrent format after version 0.2.0.
 - Decoder and encoder for torrent files
 - Auto decode bytes field to string with used specified encoding and error handler
 - Auto detect encoding when use `auto` as encoding(need `chardet` installed)
-- Auto decode hash value filed to hash blocks
-- Uniform exception type
+- Auto decode hash value filed to hash blocks, also customizable
 - CLI provided, with JSON output
 
 ## Install
