@@ -79,11 +79,12 @@ __all__ = [
     "encode",
     "decode",
     "TorrentFileParser",
+    "TorrentFileCreator",
     "create_torrent_file",
     "parse_torrent_file",
 ]
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 
 def detect(content):

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## [0.4.0] - 2022.01.17
+
 ### Added
 
 - Add `usebytes` error handler. It will use `strict` mode when decoding bytes to string, but if error happened, it returns raw bytes instead of raise exception.
@@ -107,6 +109,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 [@ltfychrise]: https://github.com/ltfychrise
 [@yasuotakei]: https://github.com/yasuotakei
 [Unreleased]: https://github.com/7sDream/torrent_parser/compare/v0.3.0...HEAD
+[0.4.0]: https://github.com/7sDream/torrent_parser/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/7sDream/torrent_parser/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/7sDream/torrent_parser/compare/v0.1.5rc1...v0.2.0
 [0.1.5rc1]: https://github.com/7sDream/torrent_parser/compare/v0.1.4...v0.1.5rc1
