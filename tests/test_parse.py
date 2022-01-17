@@ -10,6 +10,7 @@ from torrent_parser import TorrentFileParser, parse_torrent_file
 class TestParse(unittest.TestCase):
     TEST_FILES_DIR = os.path.join(os.path.dirname(__file__), 'test_files')
     REAL_FILE = os.path.join(TEST_FILES_DIR, 'real.torrent')
+    REAL_FILE_V2 = os.path.join(TEST_FILES_DIR, 'bittorrent-v2-test.torrent')
     NEG_FILE = os.path.join(TEST_FILES_DIR, 'neg.torrent')
     STRING_FILE = os.path.join(TEST_FILES_DIR, 'outmost.string.torrent')
 
@@ -37,6 +38,15 @@ class TestParse(unittest.TestCase):
         self.assertIn(['udp://tracker.publicbt.com:80/announce'],
                       data['announce-list'])
         self.assertEqual(data['creation date'], 1409254242)
+
+    def test_parse_v2(self):
+        data = parse_torrent_file(
+            self.REAL_FILE_V2,
+        )
+        (k, v) = next(iter(data["piece layers"].items()))
+        self.assertIsInstance(k, bytes)
+        self.assertIsInstance(v, bytes)
+
 
     def test_parse_two_times(self):
         with open(self.REAL_FILE, 'rb') as fp:

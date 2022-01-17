@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Added
+
+- Add `usebytes` error handler. It will use `strict` mode when decoding bytes to string, but if error happened, it returns raw bytes instead of raise exception.
+- Add `TorrentFileCreator` class.
+
+### Changed
+
+- Default mode of `parse_torrent_file` and `TorrentFileParser` change to `usebytes`.
+- **BREAK!**`BEcoder` and `BDecoder` will not treat any field as hash fields by default.
+- `BDecoder` accept file-like object as input.
+
 ## [0.3.0] - 2018.06.23
 
 ### Added

@@ -16,7 +16,7 @@ setup(
     url='https://github.com/7sDream/torrent_parser',
     license='MIT',
     author='7sDream',
-    author_email='7seconddream@gmail.com',
+    author_email='i@7sdre.am',
     description='A .torrent file parser and creator for both Python 2 and 3',
     install_requires=[],
     entry_points={
@@ -34,6 +34,10 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7'
+        'Programming Language :: Python :: 3.8'
+        'Programming Language :: Python :: 3.9'
+        'Programming Language :: Python :: 3.10'
         'Topic :: Multimedia',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Utilities',
