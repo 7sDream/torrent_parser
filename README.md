@@ -18,16 +18,16 @@ Can also edit and write back to torrent format after version 0.2.0.
 pip install torrent_parser
 ```
 
-## Usage:
+## Usage
 
 ### CLI
 
 ```
-$ pytp test.torrent
+pytp test.torrent
 ```
 
 ```
-$ cat test.torrent | pytp
+cat test.torrent | pytp
 ```
 
 ![][screenshots-help]
@@ -35,7 +35,6 @@ $ cat test.torrent | pytp
 ![][screenshots-normal]
 
 ![][screenshots-indent]
-
 
 ### As a module
 

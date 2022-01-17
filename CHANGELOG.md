@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Add `usebytes` error handler. It will use `strict` mode when decoding bytes to string, but if error happened, it returns raw bytes instead of raise exception.
 - Add `TorrentFileCreator` class.
+- **Internal** Add `DataWrapper` and `JSONEncoderDataWrapperBytesToString` for output convert `bytes` into `string` when output using json format. CLI output needs them, but normal users should not use those two class.
 
 ### Changed
 

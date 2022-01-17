@@ -43,6 +43,8 @@ import json
 import sys
 import warnings
 
+from typing_extensions import OrderedDict
+
 try:
     FileNotFoundError
 except NameError:
@@ -718,6 +720,31 @@ def create_torrent_file(filename, data, encoding="utf-8", hash_fields=None):
     TorrentFileCreator(data, encoding, hash_fields).create(filename)
 
 
+class DataWrapper:
+    def __init__(self, data):
+        self.data = data
+
+
+class JSONEncoderDataWrapperBytesToString(json.JSONEncoder):
+    def process(self, o):
+        if isinstance(o, bytes_type):
+            return binascii.hexlify(o).decode("ascii")
+        if isinstance(o, collections.OrderedDict):
+            output = collections.OrderedDict()
+            for k, v in o.items():
+                output[self.process(k)] = self.process(v)
+        if isinstance(o, dict):
+            return {self.process(k): self.process(v) for k, v in o.items()}
+        if isinstance(o, list):
+            return [self.process(v) for v in o]
+        return o
+
+    def default(self, o):
+        if isinstance(o, DataWrapper):
+            return self.process(o.data)
+        return json.JSONEncoder.default(self, o)
+
+
 def __main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -757,9 +784,10 @@ def __main():
     parser.add_argument(
         "--errors",
         "-e",
-        default="strict",
-        help='decoding error handler, default "strict", you can'
-        ' use "ignore" or "replace" to avoid exception',
+        default=BDecoder.ERROR_HANDLER_USEBYTES,
+        help='decoding error handler, default "'
+        + BDecoder.ERROR_HANDLER_USEBYTES
+        + '"',
     )
     parser.add_argument(
         "--version",
@@ -788,11 +816,15 @@ def __main():
         target_file, not args.dict, args.coding, args.errors
     ).parse()
 
-    data = json.dumps(
-        data, ensure_ascii=args.ascii, sort_keys=args.sort, indent=args.indent
+    text = json.dumps(
+        DataWrapper(data),
+        ensure_ascii=args.ascii,
+        sort_keys=args.sort,
+        indent=args.indent,
+        cls=JSONEncoderDataWrapperBytesToString,
     )
 
-    print(data)
+    print(text)
 
 
 if __name__ == "__main__":
