@@ -43,8 +43,6 @@ import json
 import sys
 import warnings
 
-from typing_extensions import OrderedDict
-
 try:
     FileNotFoundError
 except NameError:
