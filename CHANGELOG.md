@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+### Add
+
+- cli add `--hash-row`, `-r` option to use raw hash strategy.
+
+### Fixed
+
+- Fix fields order in CLI output may not as same as it in origin files.
+
 ## [0.4.0] - 2022.01.17
 
 ### Added
