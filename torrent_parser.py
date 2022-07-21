@@ -732,6 +732,7 @@ class JSONEncoderDataWrapperBytesToString(json.JSONEncoder):
             output = collections.OrderedDict()
             for k, v in o.items():
                 output[self.process(k)] = self.process(v)
+            return output
         if isinstance(o, dict):
             return {self.process(k): self.process(v) for k, v in o.items()}
         if isinstance(o, list):
@@ -789,6 +790,13 @@ def __main():
         + '"',
     )
     parser.add_argument(
+        "--hash-raw",
+        "-r",
+        action="store_true",
+        default=False,
+        help="do not group hash field by block, keeps it as raw bytes",
+    )
+    parser.add_argument(
         "--version",
         "-v",
         action="store_true",
@@ -812,7 +820,11 @@ def __main():
 
     # noinspection PyUnboundLocalVariable
     data = TorrentFileParser(
-        target_file, not args.dict, args.coding, args.errors
+        target_file,
+        use_ordered_dict=not args.dict,
+        encoding=args.coding,
+        errors=args.errors,
+        hash_raw=args.hash_raw,
     ).parse()
 
     text = json.dumps(
