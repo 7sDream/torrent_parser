@@ -4,9 +4,8 @@ import binascii
 import hashlib
 import os.path
 import unittest
-from distutils.log import info
 
-from torrent_parser import create_torrent_file, encode, parse_torrent_file
+from torrent_parser import encode, parse_torrent_file
 
 
 class TestInfoHash(unittest.TestCase):
