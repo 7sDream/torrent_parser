@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 
 - Fix fields order in CLI output may not as same as it in origin files.
+- Remove useless dependency `typing_extensions`。（#12）
 
 ## [0.4.0] - 2022.01.17
 
